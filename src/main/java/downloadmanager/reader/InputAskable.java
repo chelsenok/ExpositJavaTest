@@ -1,4 +1,4 @@
-package downloadmanager.readstrategy;
+package downloadmanager.reader;
 
 public interface InputAskable {
 

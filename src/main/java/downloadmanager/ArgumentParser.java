@@ -16,19 +16,19 @@ public class ArgumentParser {
 
     public Map<String, String[]> getArgumentedMap() {
         if (mArgs == null || mArgs.length == 0 || !isOperation(mArgs[0])) {
-            return new HashMap<String, String[]>(0);
+            return new HashMap<>(0);
         }
         String currentOperation = mArgs[0];
         List<String> list = new ArrayList<String>();
         final Map<String, String[]> hashMap = new HashMap<String, String[]>();
         for (int i = 1; i < mArgs.length; i++) {
-            if (isOperation(mArgs[i])) {
-                final String[] array = new String[list.size()];
-                hashMap.put(currentOperation, list.toArray(array));
-                list = new ArrayList<String>();
-                currentOperation = mArgs[i];
+            final String currentString = mArgs[i];
+            if (isOperation(currentString) && !hashMap.containsKey(currentString)) {
+                hashMap.put(currentOperation, list.toArray(new String[list.size()]));
+                list = new ArrayList<>();
+                currentOperation = currentString;
             } else {
-                list.add(mArgs[i]);
+                list.add(currentString);
             }
         }
         put(hashMap, currentOperation, list);

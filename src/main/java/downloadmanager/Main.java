@@ -3,13 +3,14 @@ package downloadmanager;
 import java.util.Map;
 import java.util.Scanner;
 
-import downloadmanager.readstrategy.ReadStrategy;
-import downloadmanager.readstrategy.ReadStrategyFactory;
+import downloadmanager.reader.ReadStrategy;
+import downloadmanager.reader.ReadStrategyFactory;
 
-import static downloadmanager.Main.OperationTypes.FILE;
+import static downloadmanager.Main.OperationTypes.FILE_PATH;
 import static downloadmanager.Main.OperationTypes.HELP;
 import static downloadmanager.Main.OperationTypes.PATH;
 import static downloadmanager.Main.OperationTypes.REFERENCE;
+import static downloadmanager.Main.OperationTypes.THREADS;
 
 public final class Main {
 
@@ -19,7 +20,7 @@ public final class Main {
     public interface OperationTypes {
 
         String PATH = "-p";
-        String FILE = "-f";
+        String FILE_PATH = "-f";
         String HELP = "--help";
         String THREADS = "-t";
         String REFERENCE = "-l";
@@ -27,12 +28,12 @@ public final class Main {
 
     public enum DownloadDataType {
         File,
-        Reference
+        SingleReference
     }
 
     public static void main(String... args) {
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-        args = new String[]{"--help", "greg"};
+        args = new String[]{"-p", "D:dijig", "-l", "http", "-t", "12"};
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         final ArgumentParser argumentParser = new ArgumentParser(args);
         final Map<String, String[]> hashMap = argumentParser.getArgumentedMap();
@@ -41,14 +42,20 @@ public final class Main {
             exit(message);
         }
         final File[] files = getFiles(hashMap);
+        final DownloadManager downloadManager = new DownloadManager();
+        if (hashMap.containsKey(THREADS)) {
+            downloadManager.download(files, Integer.valueOf(hashMap.get(THREADS)[0]));
+        } else {
+            downloadManager.download(files);
+        }
     }
 
     private static File[] getFiles(final Map<String, String[]> hashMap) {
         final DownloadDataType downloadType = getDownloadType(hashMap);
-        if (downloadType == DownloadDataType.Reference) {
+        if (downloadType == DownloadDataType.SingleReference) {
             return new File[]{new File(hashMap.get(REFERENCE)[0], hashMap.get(PATH)[0])};
         } else if (downloadType == DownloadDataType.File) {
-            final String path = hashMap.get(FILE)[0];
+            final String path = hashMap.get(FILE_PATH)[0];
             final ReadStrategy readStrategy = getReaderStrategy(path);
             if (readStrategy == null) {
                 exit(generateUnknownFileFormatMessage());
@@ -75,9 +82,9 @@ public final class Main {
 
     private static DownloadDataType getDownloadType(final Map<String, String[]> hashMap) {
         if (hashMap.get(REFERENCE).length != 0) {
-            return DownloadDataType.Reference;
+            return DownloadDataType.SingleReference;
         }
-        if (hashMap.get(FILE).length != 0) {
+        if (hashMap.get(FILE_PATH).length != 0) {
             return DownloadDataType.File;
         }
         return null;
@@ -94,12 +101,27 @@ public final class Main {
                 return generateHelpMessage();
             }
         }
-        if ((hashMap.get(REFERENCE).length == 0 && hashMap.get(FILE).length == 0)
-                || (!hashMap.containsKey(REFERENCE) && !hashMap.containsKey(FILE))) {
+        if ((!hashMap.containsKey(REFERENCE) && !hashMap.containsKey(FILE_PATH)) ||
+                (hashMap.containsKey(REFERENCE) && hashMap.containsKey(FILE_PATH)
+                        && hashMap.get(REFERENCE).length == 0 && hashMap.get(FILE_PATH).length == 0)) {
             return generateSyntaxErrorMessage();
         }
-        if (hashMap.get(REFERENCE).length != 0 && hashMap.get(FILE).length != 0) {
+        if (hashMap.containsKey(REFERENCE) && hashMap.containsKey(FILE_PATH) &&
+                hashMap.get(REFERENCE).length != 0 && hashMap.get(FILE_PATH).length != 0) {
             return generateLackOfDataMessage();
+        }
+        if (hashMap.containsKey(THREADS)) {
+            if (hashMap.get(THREADS).length != 1) {
+                return generateSyntaxErrorMessage();
+            }
+            Integer integer = null;
+            try {
+                integer = Integer.valueOf(hashMap.get(THREADS)[0]);
+            } catch (final NumberFormatException ignored) {
+            }
+            if (integer == null || integer < 1) {
+                return generateSyntaxErrorMessage();
+            }
         }
         return SUCCESS;
     }
