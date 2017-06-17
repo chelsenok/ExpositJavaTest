@@ -9,9 +9,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import downloadmanager.File;
+import downloadmanager.file.File;
 
-public class JsonReader implements ReadStrategy {
+public class JsonReader implements Reader {
 
     static final String REFERENCE_MESSAGE = "JSON-reference element key: ";
     static final String PATH_MESSAGE = "JSON-path element key: ";
@@ -30,8 +30,7 @@ public class JsonReader implements ReadStrategy {
             final StringBuilder builder = new StringBuilder();
             java.nio.file.Files.lines(Paths.get(path)).forEach(builder::append);
             final JsonParser parser = new JsonParser();
-            final JsonObject mainObject = parser.parse(builder.toString()).getAsJsonObject();
-            final JsonArray pItem = mainObject.getAsJsonArray();
+            final JsonArray pItem = parser.parse(builder.toString()).getAsJsonArray();
             for (final JsonElement user : pItem) {
                 final JsonObject userObject = user.getAsJsonObject();
                 files.add(new File(

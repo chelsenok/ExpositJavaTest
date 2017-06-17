@@ -1,4 +1,4 @@
-package downloadmanager.constants;
+package downloadmanager.parser;
 
 public enum OperationTypes {
 

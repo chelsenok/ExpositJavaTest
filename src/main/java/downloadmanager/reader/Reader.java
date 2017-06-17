@@ -1,8 +1,8 @@
 package downloadmanager.reader;
 
-import downloadmanager.File;
+import downloadmanager.file.File;
 
-public interface ReadStrategy {
+public interface Reader {
 
     /**
      * @param path path to the file in your filesystem

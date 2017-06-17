@@ -5,9 +5,9 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import downloadmanager.File;
+import downloadmanager.file.File;
 
-public class CsvReader implements ReadStrategy {
+public class CsvReader implements Reader {
 
     private final String SEPARATOR = ",";
 

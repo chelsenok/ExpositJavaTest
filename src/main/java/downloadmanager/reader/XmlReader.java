@@ -11,9 +11,9 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import downloadmanager.File;
+import downloadmanager.file.File;
 
-public class XmlReader implements ReadStrategy {
+public class XmlReader implements Reader {
 
     static final String ROOT_MESSAGE = "XML-item element name: ";
     static final String REFERENCE_MESSAGE = "XML-reference element name: ";

@@ -1,4 +1,4 @@
-package downloadmanager;
+package downloadmanager.file;
 
 public class File {
 
@@ -6,6 +6,7 @@ public class File {
     private final String mPath;
 
     public File(final String reference, final String path) {
+        final java.io.File file = new java.io.File(path);
         mReference = reference;
         mPath = path;
     }

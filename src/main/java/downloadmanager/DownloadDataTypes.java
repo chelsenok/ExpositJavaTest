@@ -1,4 +1,4 @@
-package downloadmanager.constants;
+package downloadmanager;
 
 public enum DownloadDataTypes {
     File,

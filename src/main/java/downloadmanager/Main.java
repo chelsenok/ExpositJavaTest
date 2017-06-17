@@ -1,13 +1,16 @@
 package downloadmanager;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Map;
 import java.util.Scanner;
 
-import downloadmanager.constants.DownloadDataTypes;
-import downloadmanager.constants.OperationTypes;
-import downloadmanager.constants.StatusMessages;
-import downloadmanager.reader.ReadStrategy;
-import downloadmanager.reader.ReadStrategyFactory;
+import downloadmanager.downloader.Downloader;
+import downloadmanager.file.File;
+import downloadmanager.parser.ArgumentParser;
+import downloadmanager.parser.OperationTypes;
+import downloadmanager.reader.Reader;
+import downloadmanager.reader.ReaderFactory;
 
 public final class Main {
 
@@ -15,25 +18,25 @@ public final class Main {
 
     public static void main(String... args) {
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-        args = new String[]{"-f", "file.json", "-p", "blabla"};
+        args = new String[]{"-f", "file.csv"};
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         final ArgumentParser argumentParser = new ArgumentParser(args);
         final Map<String, String[]> hashMap = argumentParser.getArgumentedMap();
-        final StatusMessages message = getMapStatusMessage(hashMap);
+        final StatusMessages message = getArgumentsStatusMessage(hashMap);
         if (message != (StatusMessages.Success)) {
             exit(message.getMessage(APP_NAME));
         }
         final DownloadDataTypes downloadType = getDownloadType(hashMap);
         final File[] files = getFiles(hashMap, downloadType);
-        final DownloadManager downloadManager = new DownloadManager();
+        final Downloader downloader = new Downloader();
         if (hashMap.containsKey(OperationTypes.Threads.getType())) {
-            downloadManager.download(files, Integer.valueOf(hashMap.get(OperationTypes.Threads.getType())[0]));
+            downloader.download(files, Integer.valueOf(hashMap.get(OperationTypes.Threads.getType())[0]));
         } else {
-            downloadManager.download(files);
+            downloader.download(files);
         }
     }
 
-    private static File[] getFiles(final Map<String, String[]> hashMap, final DownloadDataTypes downloadType) {
+    private static @Nullable File[] getFiles(final Map<String, String[]> hashMap, final DownloadDataTypes downloadType) {
         if (downloadType == DownloadDataTypes.SingleReference) {
             return new File[]{new File(
                     hashMap.get(OperationTypes.Reference.getType())[0],
@@ -44,11 +47,11 @@ public final class Main {
             if (!fileExist(path)) {
                 exit(StatusMessages.NonExistentFile.getMessage(APP_NAME));
             }
-            final ReadStrategy readStrategy = getReaderStrategy(path);
-            if (readStrategy == null) {
+            final Reader reader = getReader(path);
+            if (reader == null) {
                 exit(StatusMessages.UnknownFileFormat.getMessage(APP_NAME));
             }
-            return readStrategy.readFiles(path);
+            return reader.readFiles(path);
         }
         return null;
     }
@@ -58,13 +61,13 @@ public final class Main {
         return f.exists() && !f.isDirectory();
     }
 
-    private static ReadStrategy getReaderStrategy(final String path) {
+    private static Reader getReader(final String path) {
         String extension = "";
         final int i = path.lastIndexOf('.');
         if (i > 0) {
             extension = path.substring(i + 1);
         }
-        return ReadStrategyFactory.getStrategy(
+        return ReaderFactory.getStrategy(
                 extension,
                 (message) -> {
                     System.out.print(message);
@@ -85,9 +88,23 @@ public final class Main {
         return null;
     }
 
-    private static StatusMessages getMapStatusMessage(final Map<String, String[]> hashMap) {
+    private static StatusMessages getArgumentsStatusMessage(final Map<String, String[]> hashMap) {
         if (hashMap.isEmpty()) {
             return StatusMessages.SyntaxError;
+        }
+        for (final Map.Entry<String, String[]> entry :
+                hashMap.entrySet()) {
+            boolean exist = false;
+            for (final OperationTypes operation :
+                    OperationTypes.values()) {
+                if (entry.getKey().equals(operation.getType())) {
+                    exist = true;
+                    break;
+                }
+            }
+            if (!exist) {
+                exit(StatusMessages.SyntaxError.getMessage(APP_NAME));
+            }
         }
 //        final boolean pathState = hashMap.containsKey(OperationTypes.Path.getType())
 //                && hashMap.get(OperationTypes.Path.getType()).length == 1;
@@ -100,16 +117,12 @@ public final class Main {
                 return StatusMessages.Help;
             }
         }
-        if (!hashMap.containsKey(OperationTypes.Path.getType())) {
-            return StatusMessages.SyntaxError;
-        }
         if ((!hashMap.containsKey(OperationTypes.Reference.getType()) &&
                 !hashMap.containsKey(OperationTypes.FilePath.getType())) ||
                 (hashMap.containsKey(OperationTypes.Reference.getType()) &&
                         hashMap.containsKey(OperationTypes.FilePath.getType()) &&
                         hashMap.get(OperationTypes.Reference.getType()).length == 0 &&
-                        hashMap.get(OperationTypes.FilePath.getType()).length == 0) ||
-                !hashMap.containsKey(OperationTypes.Path.getType())) {
+                        hashMap.get(OperationTypes.FilePath.getType()).length == 0)) {
             return StatusMessages.SyntaxError;
         }
         if (hashMap.containsKey(OperationTypes.Reference.getType()) && hashMap.containsKey(OperationTypes.FilePath.getType()) &&

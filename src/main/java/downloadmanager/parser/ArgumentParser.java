@@ -1,4 +1,4 @@
-package downloadmanager;
+package downloadmanager.parser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
