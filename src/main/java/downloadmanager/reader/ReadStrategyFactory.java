@@ -13,7 +13,7 @@ public abstract class ReadStrategyFactory {
         String JSON = "json";
     }
 
-    public static ReadStrategy getStrategy(final String fileFormat, final InputAskable askable) {
+    public static ReadStrategy getStrategy(final String fileFormat, final Input askable) {
         switch (fileFormat) {
             case CSV:
                 return new CsvReader();

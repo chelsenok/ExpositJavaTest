@@ -1,6 +1,6 @@
 package downloadmanager.reader;
 
-public interface InputAskable {
+public interface Input {
 
     String ask(final String message);
 

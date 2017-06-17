@@ -25,8 +25,8 @@ public class JsonReader implements ReadStrategy {
     }
 
     public File[] readFiles(final String path) {
-        final List<File> files = new ArrayList<>();
         try {
+            final List<File> files = new ArrayList<>();
             final StringBuilder builder = new StringBuilder();
             java.nio.file.Files.lines(Paths.get(path)).forEach(builder::append);
             final JsonParser parser = new JsonParser();
@@ -39,8 +39,9 @@ public class JsonReader implements ReadStrategy {
                         userObject.get(mPath).getAsString()
                 ));
             }
+            return files.toArray(new File[files.size()]);
         } catch (final Exception ignored) {
+            return null;
         }
-        return files.toArray(new File[files.size()]);
     }
 }

@@ -12,9 +12,9 @@ public class CsvReader implements ReadStrategy {
     private final String SEPARATOR = ",";
 
     public File[] readFiles(final String path) {
-        final List<File> files = new ArrayList<>();
         BufferedReader br = null;
         try {
+            final List<File> files = new ArrayList<>();
             br = new BufferedReader(new FileReader(path));
             String line;
             while ((line = br.readLine()) != null) {
@@ -24,13 +24,14 @@ public class CsvReader implements ReadStrategy {
                         content[1]
                 ));
             }
+            return files.toArray(new File[files.size()]);
         } catch (final Exception ignored) {
+            return null;
         } finally {
             try {
                 br.close();
             } catch (final Exception ignored) {
             }
         }
-        return files.toArray(new File[files.size()]);
     }
 }

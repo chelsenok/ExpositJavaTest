@@ -30,8 +30,8 @@ public class XmlReader implements ReadStrategy {
     }
 
     public File[] readFiles(final String path) {
-        final List<File> fileList = new ArrayList<>();
         try {
+            final List<File> fileList = new ArrayList<>();
             final java.io.File inputFile = new java.io.File(path);
             final DocumentBuilderFactory dbFactory
                     = DocumentBuilderFactory.newInstance();
@@ -53,8 +53,9 @@ public class XmlReader implements ReadStrategy {
                     ));
                 }
             }
+            return fileList.toArray(new File[fileList.size()]);
         } catch (final Exception ignored) {
+            return null;
         }
-        return fileList.toArray(new File[fileList.size()]);
     }
 }
