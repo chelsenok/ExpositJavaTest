@@ -1,6 +1,6 @@
 package downloadmanager.reader;
 
-import downloadmanager.file.File;
+import downloadmanager.File;
 
 public interface Reader {
 
@@ -10,5 +10,5 @@ public interface Reader {
      *      File[] - file exists and properly formed<br>
      *      null - file corrupted
      */
-    File[] readFiles(final String path);
+    File[] readFiles(final String path, final String downloadPath);
 }

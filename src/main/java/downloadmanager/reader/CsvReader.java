@@ -2,16 +2,17 @@ package downloadmanager.reader;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import downloadmanager.file.File;
+import downloadmanager.File;
 
 public class CsvReader implements Reader {
 
     private final String SEPARATOR = ",";
 
-    public File[] readFiles(final String path) {
+    public File[] readFiles(final String path, final String downloadPath) {
         BufferedReader br = null;
         try {
             final List<File> files = new ArrayList<>();
@@ -21,16 +22,16 @@ public class CsvReader implements Reader {
                 final String[] content = line.split(SEPARATOR);
                 files.add(new File(
                         content[0],
-                        content[1]
+                        downloadPath + content[1]
                 ));
             }
             return files.toArray(new File[files.size()]);
-        } catch (final Exception ignored) {
+        } catch (final IOException ignored) {
             return null;
         } finally {
             try {
                 br.close();
-            } catch (final Exception ignored) {
+            } catch (final IOException ignored) {
             }
         }
     }

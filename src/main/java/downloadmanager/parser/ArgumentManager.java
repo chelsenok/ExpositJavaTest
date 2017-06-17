@@ -2,11 +2,11 @@ package downloadmanager.parser;
 
 import java.util.Map;
 
-import static downloadmanager.parser.OperationTypes.DownloadPath;
-import static downloadmanager.parser.OperationTypes.FilePath;
-import static downloadmanager.parser.OperationTypes.Help;
-import static downloadmanager.parser.OperationTypes.Reference;
-import static downloadmanager.parser.OperationTypes.Threads;
+import static downloadmanager.parser.OperationType.DOWNLOAD_PATH;
+import static downloadmanager.parser.OperationType.FILE_PATH;
+import static downloadmanager.parser.OperationType.HELP;
+import static downloadmanager.parser.OperationType.REFERENCE;
+import static downloadmanager.parser.OperationType.THREADS;
 
 public class ArgumentManager {
 
@@ -19,11 +19,11 @@ public class ArgumentManager {
 
     public ArgumentManager(final String[] args) {
         final Map<String, String[]> map = new ArgumentParser(args).getArgumentedMap();
-        downloadPath = (String) get(map, DownloadPath.getType());
-        filePath = (String) get(map, FilePath.getType());
-        reference = (String) get(map, Reference.getType());
-        threads = getThreads(map, Threads.getType());
-        needHelp = needHelp(map, Help.getType());
+        downloadPath = (String) get(map, DOWNLOAD_PATH.getType());
+        filePath = (String) get(map, FILE_PATH.getType());
+        reference = (String) get(map, REFERENCE.getType());
+        threads = getThreads(map, THREADS.getType());
+        needHelp = needHelp(map, HELP.getType());
         isValid = isValid(map, needHelp);
     }
 
@@ -46,8 +46,8 @@ public class ArgumentManager {
         for (final Map.Entry<String, String[]> entry :
                 map.entrySet()) {
             boolean exist = false;
-            for (final OperationTypes type :
-                    OperationTypes.values()) {
+            for (final OperationType type :
+                    OperationType.values()) {
                 if (entry.getKey().equals(type.getType())) {
                     exist = true;
                     break;
@@ -61,7 +61,7 @@ public class ArgumentManager {
     }
 
     private int getThreads(final Map<String, String[]> map, final String type) {
-        final Integer integer = (Integer) get(map, Threads.getType());
+        final Integer integer = (Integer) get(map, THREADS.getType());
         if (integer == null) {
             return  1;
         } else {

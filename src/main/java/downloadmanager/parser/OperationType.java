@@ -1,32 +1,32 @@
 package downloadmanager.parser;
 
-enum OperationTypes {
+enum OperationType {
 
-    DownloadPath {
+    DOWNLOAD_PATH {
         @Override
         public String getType() {
             return "-p";
         }
     },
-    FilePath {
+    FILE_PATH {
         @Override
         public String getType() {
             return "-f";
         }
     },
-    Help {
+    HELP {
         @Override
         public String getType() {
             return "--help";
         }
     },
-    Threads {
+    THREADS {
         @Override
         public String getType() {
             return "-t";
         }
     },
-    Reference {
+    REFERENCE {
         @Override
         public String getType() {
             return "-l";

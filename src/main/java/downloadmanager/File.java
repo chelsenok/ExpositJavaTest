@@ -1,4 +1,6 @@
-package downloadmanager.file;
+package downloadmanager;
+
+import org.apache.commons.validator.routines.UrlValidator;
 
 public class File {
 
@@ -8,15 +10,24 @@ public class File {
 
     public File(final String reference, final String path) {
         mReference = reference;
-        mPath = getPath(path, reference);
-        isWritable = isWritable(mPath);
+        if (!isLinkValid(mReference)) {
+            mPath = path;
+            isWritable = false;
+        } else {
+            mPath = getFullPath(path, mReference);
+            isWritable = isWritable(getFolderPath(mPath));
+        }
+    }
+
+    private String getFolderPath(final String path) {
+        return path.substring(0, path.lastIndexOf('/'));
     }
 
     private boolean isWritable(final String path) {
         return new java.io.File(path).canWrite();
     }
 
-    private String getPath(final String path, final String reference) {
+    private String getFullPath(final String path, final String reference) {
         String p = path;
         if (p == null) {
             p = System.getProperty("user.home") + "/Downloads" + getFileNameFromLink(reference);
@@ -28,5 +39,9 @@ public class File {
 
     private String getFileNameFromLink(final String link) {
         return link.substring(link.lastIndexOf('/'));
+    }
+
+    private boolean isLinkValid(final String reference) {
+        return new UrlValidator().isValid(reference);
     }
 }

@@ -4,14 +4,17 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
-import downloadmanager.file.File;
+import downloadmanager.File;
 
 public class XmlReader implements Reader {
 
@@ -29,7 +32,7 @@ public class XmlReader implements Reader {
         mPath = path;
     }
 
-    public File[] readFiles(final String path) {
+    public File[] readFiles(final String path, final String downloadPath) {
         try {
             final List<File> fileList = new ArrayList<>();
             final java.io.File inputFile = new java.io.File(path);
@@ -47,14 +50,14 @@ public class XmlReader implements Reader {
                             eElement.getElementsByTagName(mReference)
                                     .item(0)
                                     .getTextContent(),
-                            eElement.getElementsByTagName(mPath)
+                            downloadPath + eElement.getElementsByTagName(mPath)
                                     .item(0)
                                     .getTextContent()
                     ));
                 }
             }
             return fileList.toArray(new File[fileList.size()]);
-        } catch (final Exception ignored) {
+        } catch (final SAXException | IOException | ParserConfigurationException ignored) {
             return null;
         }
     }

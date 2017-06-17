@@ -5,11 +5,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import downloadmanager.file.File;
+import downloadmanager.File;
 
 public class JsonReader implements Reader {
 
@@ -24,7 +25,7 @@ public class JsonReader implements Reader {
         mPath = path;
     }
 
-    public File[] readFiles(final String path) {
+    public File[] readFiles(final String path, final String downloadPath) {
         try {
             final List<File> files = new ArrayList<>();
             final StringBuilder builder = new StringBuilder();
@@ -35,11 +36,11 @@ public class JsonReader implements Reader {
                 final JsonObject userObject = user.getAsJsonObject();
                 files.add(new File(
                         userObject.get(mReference).getAsString(),
-                        userObject.get(mPath).getAsString()
+                        downloadPath + userObject.get(mPath).getAsString()
                 ));
             }
             return files.toArray(new File[files.size()]);
-        } catch (final Exception ignored) {
+        } catch (final IOException ignored) {
             return null;
         }
     }

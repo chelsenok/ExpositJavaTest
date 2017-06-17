@@ -1,55 +1,55 @@
 package downloadmanager;
 
-public enum StatusMessages {
-    UnknownFileFormat {
+public enum StatusMessage {
+    UNKNOWN_FILE_FORMAT {
         @Override
         public String getMessage(final String appName) {
-            return "Unknown file format.\n" + TryHelp.getMessage(appName);
+            return "Unknown file format.\n" + TRY_HELP.getMessage(appName);
         }
     },
-    LackOfData {
+    LACK_OF_DATA {
         @Override
         public String getMessage(final String appName) {
-            return "Lack of data for downloading.\n" + TryHelp.getMessage(appName);
+            return "Lack of data for downloading.\n" + TRY_HELP.getMessage(appName);
         }
     },
-    SyntaxError {
+    SYNTAX_ERROR {
         @Override
         public String getMessage(final String appName) {
-            return appName + ": missing operand\n" + TryHelp.getMessage(appName);
+            return appName + ": missing operand\n" + TRY_HELP.getMessage(appName);
         }
     },
-    TryHelp {
+    TRY_HELP {
         @Override
         public String getMessage(final String appName) {
             return "Try '" + appName + " --help' for more information.";
         }
     },
-    Help {
+    HELP {
         @Override
         public String getMessage(final String appName) {
             return "Help information HERE!";
         }
     },
-    Success {
+    SUCCESS {
         @Override
         public String getMessage(final String appName) {
             return "Success.";
         }
     },
-    NonExistentFile {
+    NON_EXISTENT_FILE {
         @Override
         public String getMessage(final String appName) {
-            return "File does not exist.\n" + TryHelp.getMessage(appName);
+            return "File does not exist.\n" + TRY_HELP.getMessage(appName);
         }
     },
-    WrongThreadNumber {
+    WRONG_THREAD_NUMBER {
         @Override
         public String getMessage(final String appName) {
-            return "Thread number is wrong.\n" + TryHelp.getMessage(appName);
+            return "Thread number is wrong.\n" + TRY_HELP.getMessage(appName);
         }
     },
-    AccessDenied {
+    ACCESS_DENIED {
         @Override
         public String getMessage(final String appName) {
             return "Access to this folder from " + appName + " is denied";
