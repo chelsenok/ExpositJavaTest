@@ -2,13 +2,11 @@ package downloadmanager;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
 import java.util.Scanner;
 
 import downloadmanager.downloader.Downloader;
 import downloadmanager.file.File;
-import downloadmanager.parser.ArgumentParser;
-import downloadmanager.parser.OperationTypes;
+import downloadmanager.parser.ArgumentManager;
 import downloadmanager.reader.Reader;
 import downloadmanager.reader.ReaderFactory;
 
@@ -20,30 +18,26 @@ public final class Main {
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         args = new String[]{"-f", "file.csv"};
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-        final ArgumentParser argumentParser = new ArgumentParser(args);
-        final Map<String, String[]> hashMap = argumentParser.getArgumentedMap();
-        final StatusMessages message = getArgumentsStatusMessage(hashMap);
+        final ArgumentManager argumentManager = new ArgumentManager(args);
+        final StatusMessages message = getArgumentsStatusMessage(argumentManager);
         if (message != (StatusMessages.Success)) {
             exit(message.getMessage(APP_NAME));
         }
-        final DownloadDataTypes downloadType = getDownloadType(hashMap);
-        final File[] files = getFiles(hashMap, downloadType);
+        final DownloadDataTypes downloadType = getDownloadType(argumentManager);
+        final File[] files = getFiles(argumentManager, downloadType);
         final Downloader downloader = new Downloader();
-        if (hashMap.containsKey(OperationTypes.Threads.getType())) {
-            downloader.download(files, Integer.valueOf(hashMap.get(OperationTypes.Threads.getType())[0]));
-        } else {
-            downloader.download(files);
-        }
+        downloader.download(files, argumentManager.threads);
     }
 
-    private static @Nullable File[] getFiles(final Map<String, String[]> hashMap, final DownloadDataTypes downloadType) {
+    private static @Nullable File[] getFiles(final ArgumentManager manager, final DownloadDataTypes downloadType) {
         if (downloadType == DownloadDataTypes.SingleReference) {
             return new File[]{new File(
-                    hashMap.get(OperationTypes.Reference.getType())[0],
-                    hashMap.get(OperationTypes.Path.getType())[0])};
+                    manager.reference,
+                    manager.downloadPath
+            )};
         }
         if (downloadType == DownloadDataTypes.File) {
-            final String path = hashMap.get(OperationTypes.FilePath.getType())[0];
+            final String path = manager.filePath;
             if (!fileExist(path)) {
                 exit(StatusMessages.NonExistentFile.getMessage(APP_NAME));
             }
@@ -58,7 +52,7 @@ public final class Main {
 
     private static boolean fileExist(final String path) {
         final java.io.File f = new java.io.File(path);
-        return f.exists() && !f.isDirectory();
+        return f.exists() && !f.isDirectory() && f.canRead();
     }
 
     private static Reader getReader(final String path) {
@@ -76,71 +70,31 @@ public final class Main {
         );
     }
 
-    private static DownloadDataTypes getDownloadType(final Map<String, String[]> hashMap) {
-        if (hashMap.containsKey(OperationTypes.Reference.getType())
-                && hashMap.get(OperationTypes.Reference.getType()).length != 0) {
+    private static DownloadDataTypes getDownloadType(final ArgumentManager manager) {
+        if (manager.downloadPath != null) {
             return DownloadDataTypes.SingleReference;
         }
-        if (hashMap.containsKey(OperationTypes.FilePath.getType())
-                && hashMap.get(OperationTypes.FilePath.getType()).length != 0) {
+        if (manager.filePath != null) {
             return DownloadDataTypes.File;
         }
         return null;
     }
 
-    private static StatusMessages getArgumentsStatusMessage(final Map<String, String[]> hashMap) {
-        if (hashMap.isEmpty()) {
+    private static StatusMessages getArgumentsStatusMessage(final ArgumentManager manager) {
+        if (!manager.isValid || (manager.reference == null && manager.filePath == null)) {
             return StatusMessages.SyntaxError;
         }
-        for (final Map.Entry<String, String[]> entry :
-                hashMap.entrySet()) {
-            boolean exist = false;
-            for (final OperationTypes operation :
-                    OperationTypes.values()) {
-                if (entry.getKey().equals(operation.getType())) {
-                    exist = true;
-                    break;
-                }
-            }
-            if (!exist) {
-                exit(StatusMessages.SyntaxError.getMessage(APP_NAME));
-            }
+        if (manager.needHelp) {
+            return StatusMessages.Help;
         }
-//        final boolean pathState = hashMap.containsKey(OperationTypes.Path.getType())
-//                && hashMap.get(OperationTypes.Path.getType()).length == 1;
-//        final boolean helpState = hashMap.containsKey(OperationTypes.Help.getType())
-//                && hashMap.get(OperationTypes.Help.getType()).length == 1;
-        if (hashMap.containsKey(OperationTypes.Help.getType())) {
-            if (hashMap.size() > 1 || hashMap.get(OperationTypes.Help.getType()).length != 0) {
-                return StatusMessages.SyntaxError;
-            } else {
-                return StatusMessages.Help;
-            }
-        }
-        if ((!hashMap.containsKey(OperationTypes.Reference.getType()) &&
-                !hashMap.containsKey(OperationTypes.FilePath.getType())) ||
-                (hashMap.containsKey(OperationTypes.Reference.getType()) &&
-                        hashMap.containsKey(OperationTypes.FilePath.getType()) &&
-                        hashMap.get(OperationTypes.Reference.getType()).length == 0 &&
-                        hashMap.get(OperationTypes.FilePath.getType()).length == 0)) {
-            return StatusMessages.SyntaxError;
-        }
-        if (hashMap.containsKey(OperationTypes.Reference.getType()) && hashMap.containsKey(OperationTypes.FilePath.getType()) &&
-                hashMap.get(OperationTypes.Reference.getType()).length != 0 && hashMap.get(OperationTypes.FilePath.getType()).length != 0) {
+        if (manager.reference != null && manager.filePath != null) {
             return StatusMessages.LackOfData;
         }
-        if (hashMap.containsKey(OperationTypes.Threads.getType())) {
-            if (hashMap.get(OperationTypes.Threads.getType()).length != 1) {
-                return StatusMessages.SyntaxError;
-            }
-            Integer integer = null;
-            try {
-                integer = Integer.valueOf(hashMap.get(OperationTypes.Threads.getType())[0]);
-            } catch (final NumberFormatException ignored) {
-            }
-            if (integer == null || integer < 1) {
-                return StatusMessages.SyntaxError;
-            }
+        if (manager.threads < 1) {
+            return StatusMessages.WrongThreadNumber;
+        }
+        if (manager.downloadPath != null && !new java.io.File(manager.downloadPath).canWrite()) {
+            return StatusMessages.AccessDenied;
         }
         return StatusMessages.Success;
     }

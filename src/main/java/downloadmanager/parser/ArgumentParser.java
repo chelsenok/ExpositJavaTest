@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ArgumentParser {
+class ArgumentParser {
 
     private final String[] mArgs;
     private final char OPERATION_PREFIX = '-';

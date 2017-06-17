@@ -1,8 +1,8 @@
 package downloadmanager.parser;
 
-public enum OperationTypes {
+enum OperationTypes {
 
-    Path {
+    DownloadPath {
         @Override
         public String getType() {
             return "-p";

@@ -42,6 +42,18 @@ public enum StatusMessages {
         public String getMessage(final String appName) {
             return "File does not exist.\n" + TryHelp.getMessage(appName);
         }
+    },
+    WrongThreadNumber {
+        @Override
+        public String getMessage(final String appName) {
+            return "Thread number is wrong.\n" + TryHelp.getMessage(appName);
+        }
+    },
+    AccessDenied {
+        @Override
+        public String getMessage(final String appName) {
+            return "Access to this folder from " + appName + " is denied";
+        }
     };
 
     public abstract String getMessage(final String appName);
