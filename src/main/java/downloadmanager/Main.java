@@ -2,29 +2,47 @@ package downloadmanager;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Scanner;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.util.Observable;
+import java.util.Observer;
 
 import downloadmanager.downloader.Downloader;
+import downloadmanager.downloader.File;
 import downloadmanager.parser.ArgumentManager;
 import downloadmanager.reader.Reader;
 import downloadmanager.reader.ReaderFactory;
 
 public final class Main {
 
+    private static final String NO_INTERNET_CONNECTION = "No Internet connection.";
     private static final String APP_NAME = "downloadmanager";
+    private static final Observer sObserver = new Observer() {
+
+        @Override
+        public synchronized void update(Observable o, Object arg) {
+
+        }
+    };
 
     public static void main(String... args) {
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         args = new String[]{"-f", "file.csv"};
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         final ArgumentManager argumentManager = new ArgumentManager(args);
-        final StatusMessage message = getArgumentsStatusMessage(argumentManager);
-        if (message != (StatusMessage.SUCCESS)) {
+        final ArgumentsStatusMessage message = getArgumentsStatusMessage(argumentManager);
+        if (message != (ArgumentsStatusMessage.SUCCESS)) {
             exit(message.getMessage(APP_NAME));
+        }
+        if (!hasInternetConnection()) {
+            exit(NO_INTERNET_CONNECTION);
         }
         final DownloadDataType downloadType = getDownloadType(argumentManager);
         final File[] files = getFiles(argumentManager, downloadType);
-        new Downloader().download(files, argumentManager.threads);
+        Downloader downloader = new Downloader();
+        downloader.addObserver(sObserver);
+        downloader.download(files, argumentManager.threads);
     }
 
     private static @Nullable File[] getFiles(final ArgumentManager manager, final DownloadDataType downloadType) {
@@ -37,13 +55,18 @@ public final class Main {
         if (downloadType == DownloadDataType.FILE) {
             final String path = manager.filePath;
             if (!fileExist(path)) {
-                exit(StatusMessage.NON_EXISTENT_FILE.getMessage(APP_NAME));
+                exit(ArgumentsStatusMessage.NON_EXISTENT_FILE.getMessage(APP_NAME));
             }
             final Reader reader = getReader(path);
             if (reader == null) {
-                exit(StatusMessage.UNKNOWN_FILE_FORMAT.getMessage(APP_NAME));
+                exit(ArgumentsStatusMessage.UNKNOWN_FILE_FORMAT.getMessage(APP_NAME));
             }
-            return reader.readFiles(path, manager.downloadPath);
+            final String[][] content = reader.readContent(path);
+            final File[] files = new File[content.length];
+            for (int i = 0; i < content.length; i++) {
+                files[i] = new File(content[i][0], manager.downloadPath + content[i][1]);
+            }
+            return files;
         }
         return null;
     }
@@ -59,13 +82,7 @@ public final class Main {
         if (i > 0) {
             extension = path.substring(i + 1);
         }
-        return ReaderFactory.getStrategy(
-                extension,
-                (message) -> {
-                    System.out.print(message);
-                    return new Scanner(System.in).next();
-                }
-        );
+        return ReaderFactory.getStrategy(extension);
     }
 
     private static DownloadDataType getDownloadType(final ArgumentManager manager) {
@@ -78,23 +95,41 @@ public final class Main {
         return null;
     }
 
-    private static StatusMessage getArgumentsStatusMessage(final ArgumentManager manager) {
+    private static ArgumentsStatusMessage getArgumentsStatusMessage(final ArgumentManager manager) {
         if (!manager.isValid || (manager.reference == null && manager.filePath == null)) {
-            return StatusMessage.SYNTAX_ERROR;
+            return ArgumentsStatusMessage.SYNTAX_ERROR;
         }
         if (manager.needHelp) {
-            return StatusMessage.HELP;
+            return ArgumentsStatusMessage.HELP;
         }
         if (manager.reference != null && manager.filePath != null) {
-            return StatusMessage.LACK_OF_DATA;
+            return ArgumentsStatusMessage.LACK_OF_DATA;
         }
         if (manager.threads < 1) {
-            return StatusMessage.WRONG_THREAD_NUMBER;
+            return ArgumentsStatusMessage.WRONG_THREAD_NUMBER;
         }
         if (manager.downloadPath != null && !new java.io.File(manager.downloadPath).canWrite()) {
-            return StatusMessage.ACCESS_DENIED;
+            return ArgumentsStatusMessage.ACCESS_DENIED;
         }
-        return StatusMessage.SUCCESS;
+        return ArgumentsStatusMessage.SUCCESS;
+    }
+
+    private static boolean hasInternetConnection() {
+        final int timeout = 3000;
+        final int port = 80;
+        Socket sock = new Socket();
+        InetSocketAddress addr = new InetSocketAddress("google.com", port);
+        try {
+            sock.connect(addr, timeout);
+            return true;
+        } catch (IOException e) {
+            return false;
+        } finally {
+            try {
+                sock.close();
+            } catch (IOException ignored) {
+            }
+        }
     }
 
     private static void exit(final String message) {

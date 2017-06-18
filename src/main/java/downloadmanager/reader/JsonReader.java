@@ -10,36 +10,26 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import downloadmanager.File;
-
 public class JsonReader implements Reader {
 
-    static final String REFERENCE_MESSAGE = "JSON-reference element key: ";
-    static final String PATH_MESSAGE = "JSON-path element key: ";
+    private static final String LINK = "link";
+    private static final String PATH = "path";
 
-    private final String mReference;
-    private final String mPath;
-
-    JsonReader(final String reference, final String path) {
-        mReference = reference;
-        mPath = path;
-    }
-
-    public File[] readFiles(final String path, final String downloadPath) {
+    public String[][] readContent(final String path) {
         try {
-            final List<File> files = new ArrayList<>();
+            final List<String[]> files = new ArrayList<>();
             final StringBuilder builder = new StringBuilder();
             java.nio.file.Files.lines(Paths.get(path)).forEach(builder::append);
             final JsonParser parser = new JsonParser();
             final JsonArray pItem = parser.parse(builder.toString()).getAsJsonArray();
             for (final JsonElement user : pItem) {
                 final JsonObject userObject = user.getAsJsonObject();
-                files.add(new File(
-                        userObject.get(mReference).getAsString(),
-                        downloadPath + userObject.get(mPath).getAsString()
-                ));
+                files.add(new String[]{
+                        userObject.get(LINK).getAsString(),
+                        userObject.get(PATH).getAsString()
+                });
             }
-            return files.toArray(new File[files.size()]);
+            return files.toArray(new String[files.size()][2]);
         } catch (final IOException ignored) {
             return null;
         }

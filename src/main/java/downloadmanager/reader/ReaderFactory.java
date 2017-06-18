@@ -13,21 +13,14 @@ public abstract class ReaderFactory {
         String JSON = "json";
     }
 
-    public static Reader getStrategy(final String fileFormat, final Input askable) {
+    public static Reader getStrategy(final String fileFormat) {
         switch (fileFormat) {
             case CSV:
                 return new CsvReader();
             case XML:
-                return new XmlReader(
-                        askable.ask(XmlReader.ROOT_MESSAGE),
-                        askable.ask(XmlReader.REFERENCE_MESSAGE),
-                        askable.ask(XmlReader.PATH_MESSAGE)
-                );
+                return new XmlReader();
             case JSON:
-                return new JsonReader(
-                        askable.ask(JsonReader.REFERENCE_MESSAGE),
-                        askable.ask(JsonReader.PATH_MESSAGE)
-                );
+                return new JsonReader();
         }
         return null;
     }

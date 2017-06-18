@@ -1,21 +1,23 @@
-package downloadmanager;
+package downloadmanager.downloader;
 
 import org.apache.commons.validator.routines.UrlValidator;
 
-public class File {
+import java.util.Observable;
 
-    private final String mReference;
-    private final String mPath;
+public class File extends Observable {
+
+    public final String link;
+    public final String path;
     public final boolean isWritable;
 
     public File(final String reference, final String path) {
-        mReference = reference;
-        if (!isLinkValid(mReference)) {
-            mPath = path;
+        link = reference;
+        if (!isLinkValid(link)) {
+            this.path = path;
             isWritable = false;
         } else {
-            mPath = getFullPath(path, mReference);
-            isWritable = isWritable(getFolderPath(mPath));
+            this.path = getFullPath(path, link);
+            isWritable = isWritable(getFolderPath(link));
         }
     }
 
@@ -42,6 +44,10 @@ public class File {
     }
 
     private boolean isLinkValid(final String reference) {
-        return new UrlValidator().isValid(reference);
+        return new UrlValidator().isValid(reference) && isLinkDownloadFile(reference);
+    }
+
+    private boolean isLinkDownloadFile(final String reference) {
+        return reference.substring(reference.lastIndexOf('/')).contains(".");
     }
 }

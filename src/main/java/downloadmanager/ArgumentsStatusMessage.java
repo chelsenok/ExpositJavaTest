@@ -1,6 +1,6 @@
 package downloadmanager;
 
-public enum StatusMessage {
+public enum ArgumentsStatusMessage {
     UNKNOWN_FILE_FORMAT {
         @Override
         public String getMessage(final String appName) {

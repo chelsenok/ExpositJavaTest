@@ -6,26 +6,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import downloadmanager.File;
-
 public class CsvReader implements Reader {
 
     private final String SEPARATOR = ",";
 
-    public File[] readFiles(final String path, final String downloadPath) {
+    public String[][] readContent(final String path) {
         BufferedReader br = null;
         try {
-            final List<File> files = new ArrayList<>();
+            final List<String[]> files = new ArrayList<>();
             br = new BufferedReader(new FileReader(path));
             String line;
             while ((line = br.readLine()) != null) {
                 final String[] content = line.split(SEPARATOR);
-                files.add(new File(
+                files.add(new String[]{
                         content[0],
-                        downloadPath + content[1]
-                ));
+                        content[1]
+                });
             }
-            return files.toArray(new File[files.size()]);
+            return files.toArray(new String[files.size()][2]);
         } catch (final IOException ignored) {
             return null;
         } finally {
