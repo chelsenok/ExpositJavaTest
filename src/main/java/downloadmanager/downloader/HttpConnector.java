@@ -1,4 +1,4 @@
-package downloadmanager.downloader.direct;
+package downloadmanager.downloader;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

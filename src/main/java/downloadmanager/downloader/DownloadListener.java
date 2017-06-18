@@ -1,6 +1,6 @@
-package downloadmanager.downloader.direct;
+package downloadmanager.downloader;
 
-public interface DownloadListener {
+interface DownloadListener {
 
 	public void onStart(String fname, int fsize);
 

@@ -2,9 +2,7 @@ package downloadmanager.downloader;
 
 import org.apache.commons.validator.routines.UrlValidator;
 
-import java.util.Observable;
-
-public class File extends Observable {
+public class File {
 
     public final String link;
     public final String path;
@@ -17,7 +15,7 @@ public class File extends Observable {
             isWritable = false;
         } else {
             this.path = getFullPath(path, link);
-            isWritable = isWritable(getFolderPath(link));
+            isWritable = isWritable(getFolderPath(this.path));
         }
     }
 

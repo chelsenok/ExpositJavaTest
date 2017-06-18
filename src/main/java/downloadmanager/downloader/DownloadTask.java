@@ -1,11 +1,11 @@
-package downloadmanager.downloader.direct;
+package downloadmanager.downloader;
 
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DownloadTask {
+class DownloadTask {
 	private URL url;
 	private OutputStream outputStream;
 	private final List<DownloadListener> listeners = new ArrayList<DownloadListener>();

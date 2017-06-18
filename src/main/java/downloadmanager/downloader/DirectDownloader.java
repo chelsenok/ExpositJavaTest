@@ -1,4 +1,4 @@
-package downloadmanager.downloader.direct;
+package downloadmanager.downloader;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -11,9 +11,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.logging.Logger;
 
-import downloadmanager.downloader.direct.util.Base64;
+import downloadmanager.downloader.utils.Base64;
 
-public class DirectDownloader extends HttpConnector {
+class DirectDownloader extends HttpConnector {
 
     private int poolSize = 3;
     private int bufferSize = 2048;
@@ -147,15 +147,10 @@ public class DirectDownloader extends HttpConnector {
 
         @Override
         public void run() {
-            while (true) {
-                try {
-                    download(task);
-                } catch (InterruptedException e) {
-                    logger.info("Stopping download thread");
-                    break;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            try {
+                download(task);
+            } catch (InterruptedException | NoSuchAlgorithmException | IOException | KeyManagementException e) {
+                e.printStackTrace();
             }
         }
 
@@ -166,6 +161,7 @@ public class DirectDownloader extends HttpConnector {
         public void shutdown() {
             stop = true;
         }
+
     }
 
     public void download(DownloadTask dt) {

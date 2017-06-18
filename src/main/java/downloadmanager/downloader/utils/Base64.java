@@ -1,4 +1,4 @@
-package downloadmanager.downloader.direct.util;
+package downloadmanager.downloader.utils;
 
 public class Base64 {
 

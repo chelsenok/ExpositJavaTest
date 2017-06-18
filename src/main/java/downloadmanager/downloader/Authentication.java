@@ -1,4 +1,4 @@
-package downloadmanager.downloader.direct;
+package downloadmanager.downloader;
 
 class Authentication {
 	public static enum AuthType {

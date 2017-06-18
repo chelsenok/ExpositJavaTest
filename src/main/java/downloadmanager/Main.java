@@ -28,7 +28,7 @@ public final class Main {
 
     public static void main(String... args) {
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-        args = new String[]{"-f", "file.csv"};
+        args = new String[]{"-l", "https://pp.userapi.com/c637720/v637720630/5fd3f/Umw4WJIKN9k.jpg"};
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         final ArgumentManager argumentManager = new ArgumentManager(args);
         final ArgumentsStatusMessage message = getArgumentsStatusMessage(argumentManager);
@@ -40,9 +40,9 @@ public final class Main {
         }
         final DownloadDataType downloadType = getDownloadType(argumentManager);
         final File[] files = getFiles(argumentManager, downloadType);
-        Downloader downloader = new Downloader();
+        Downloader downloader = new Downloader(files, argumentManager.threads);
         downloader.addObserver(sObserver);
-        downloader.download(files, argumentManager.threads);
+        downloader.download();
     }
 
     private static @Nullable File[] getFiles(final ArgumentManager manager, final DownloadDataType downloadType) {
@@ -86,7 +86,7 @@ public final class Main {
     }
 
     private static DownloadDataType getDownloadType(final ArgumentManager manager) {
-        if (manager.downloadPath != null) {
+        if (manager.reference != null) {
             return DownloadDataType.SINGLE_REFERENCE;
         }
         if (manager.filePath != null) {
