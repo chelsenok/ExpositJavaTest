@@ -4,9 +4,9 @@ import org.apache.commons.validator.routines.UrlValidator;
 
 public class File {
 
-    public final String link;
-    public final String path;
-    public final boolean isWritable;
+    final String link;
+    final String path;
+    final boolean isWritable;
 
     public File(final String reference, final String path) {
         link = reference;
@@ -15,16 +15,8 @@ public class File {
             isWritable = false;
         } else {
             this.path = getFullPath(path, link);
-            isWritable = isWritable(getFolderPath(this.path));
+            isWritable = FileAccessor.isWritable(this.path);
         }
-    }
-
-    private String getFolderPath(final String path) {
-        return path.substring(0, path.lastIndexOf('/'));
-    }
-
-    private boolean isWritable(final String path) {
-        return new java.io.File(path).canWrite();
     }
 
     private String getFullPath(final String path, final String reference) {

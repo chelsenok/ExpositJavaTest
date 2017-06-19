@@ -1,6 +1,6 @@
 package downloadmanager;
 
-public enum DownloadDataType {
+enum DownloadDataType {
     FILE,
     SINGLE_REFERENCE
 }

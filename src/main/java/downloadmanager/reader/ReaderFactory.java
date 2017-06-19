@@ -1,17 +1,10 @@
 package downloadmanager.reader;
 
-import static downloadmanager.reader.ReaderFactory.Formats.CSV;
-import static downloadmanager.reader.ReaderFactory.Formats.JSON;
-import static downloadmanager.reader.ReaderFactory.Formats.XML;
-
 public abstract class ReaderFactory {
 
-    public interface Formats {
-
-        String CSV = "csv";
-        String XML = "xml";
-        String JSON = "json";
-    }
+    private static final String CSV = "csv";
+    private static final String XML = "xml";
+    private static final String JSON = "json";
 
     public static Reader getStrategy(final String fileFormat) {
         switch (fileFormat) {

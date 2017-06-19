@@ -149,8 +149,7 @@ class DirectDownloader extends HttpConnector {
         public void run() {
             try {
                 download(task);
-            } catch (InterruptedException | NoSuchAlgorithmException | IOException | KeyManagementException e) {
-                e.printStackTrace();
+            } catch (InterruptedException | NoSuchAlgorithmException | IOException | KeyManagementException ignored) {
             }
         }
 

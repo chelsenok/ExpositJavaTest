@@ -56,6 +56,12 @@ public class ArgumentManager {
             if (!exist) {
                 return false;
             }
+            for (String s :
+                    entry.getValue()) {
+                if (entry.getKey().equals(s)) {
+                    return false;
+                }
+            }
         }
         return true;
     }

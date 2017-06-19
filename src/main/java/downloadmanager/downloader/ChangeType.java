@@ -6,5 +6,6 @@ public enum ChangeType {
     CORRUPTED_FILES,
     IN_PROCESS_FILES,
     TOTAL_SIZE,
-    PROGRESS
+    DOWNLOADED_SIZE,
+    TOTAL_FILES,
 }

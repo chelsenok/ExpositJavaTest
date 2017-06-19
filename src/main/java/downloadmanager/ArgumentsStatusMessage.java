@@ -1,6 +1,6 @@
 package downloadmanager;
 
-public enum ArgumentsStatusMessage {
+enum ArgumentsStatusMessage {
     UNKNOWN_FILE_FORMAT {
         @Override
         public String getMessage(final String appName) {
@@ -52,7 +52,7 @@ public enum ArgumentsStatusMessage {
     ACCESS_DENIED {
         @Override
         public String getMessage(final String appName) {
-            return "Access to this folder from " + appName + " is denied";
+            return "Access to this path for '" + appName + "' is denied";
         }
     };
 
