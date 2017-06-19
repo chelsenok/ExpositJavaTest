@@ -6,7 +6,7 @@ public class ProgressWriter {
     private final char FILL = ' ';
     private final String PROGRESS = "progress";
     private final int PROGRESS_WIDTH = 25;
-    private final int DEFAULT_WIDTH = 10;
+    private final int DEFAULT_WIDTH = 11;
     private final String IN_PROCESS = "in process";
     private final String DOWNLOADED = "downloaded";
     private final String CORRUPTED = "corrupted";
@@ -23,12 +23,14 @@ public class ProgressWriter {
                 + PROGRESS + String.format("%" + (PROGRESS_WIDTH - PROGRESS.length()) + "s", FILL) + SEPARATOR
                 + IN_PROCESS + String.format("%" + (DEFAULT_WIDTH - IN_PROCESS.length()) + "s", FILL) + SEPARATOR
                 + DOWNLOADED + String.format("%" + (DEFAULT_WIDTH - DOWNLOADED.length()) + "s", FILL) + SEPARATOR
-                + CORRUPTED + String.format("%" + (DEFAULT_WIDTH - CORRUPTED.length()) + "s", FILL)  + SEPARATOR
+                + CORRUPTED + String.format("%" + (DEFAULT_WIDTH - CORRUPTED.length()) + "s", FILL) + SEPARATOR
                 + TOTAL + String.format("%" + (DEFAULT_WIDTH - TOTAL.length()) + "s", FILL) + SEPARATOR
         );
+        updateConsole();
     }
 
     private void updateConsole() {
+        System.out.print('\r' + SEPARATOR);
 
     }
 

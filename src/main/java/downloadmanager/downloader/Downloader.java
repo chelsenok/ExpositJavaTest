@@ -81,16 +81,16 @@ public class Downloader extends Observable {
                 notifyObservers(DOWNLOAD_FILES);
                 mInProcessFiles--;
                 notifyObservers(IN_PROCESS_FILES);
-                ++mFilePointer;
                 download(mFilePointer);
+                ++mFilePointer;
             }
 
             @Override
             public void onCancel() {
                 mInProcessFiles--;
                 notifyObservers(IN_PROCESS_FILES);
-                ++mFilePointer;
                 download(mFilePointer);
+                ++mFilePointer;
             }
         };
     }

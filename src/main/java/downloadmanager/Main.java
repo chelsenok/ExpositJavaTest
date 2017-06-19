@@ -49,8 +49,7 @@ public final class Main {
 
     public static void main(String... args) {
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-        args = new String[]{"-l", "https://pp.userapi.com/c637720/v637720630/5fd3f/Umw4WJIKN9k.jpg",
-                "-p", "/home/alexey/Education/a.jpg"};
+        args = new String[]{"-f", "file.csv"};
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         final ArgumentManager argumentManager = new ArgumentManager(args);
         final ArgumentsStatusMessage message = getArgumentsStatusMessage(argumentManager);
@@ -87,7 +86,13 @@ public final class Main {
             final String[][] content = reader.readContent(path);
             final File[] files = new File[content.length];
             for (int i = 0; i < content.length; i++) {
-                files[i] = new File(content[i][0], manager.downloadPath + content[i][1]);
+                final String p;
+                if (manager.downloadPath == null) {
+                    p = "";
+                } else {
+                    p = manager.downloadPath + "/";
+                }
+                files[i] = new File(content[i][0], p + content[i][1]);
             }
             return files;
         }

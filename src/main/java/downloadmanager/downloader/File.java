@@ -21,7 +21,7 @@ public class File {
 
     private String getFullPath(final String path, final String reference) {
         String p = path;
-        if (p == null) {
+        if (p == null || "".equals(p.trim())) {
             p = System.getProperty("user.home") + "/Downloads" + getFileNameFromLink(reference);
         } else if (new java.io.File(path).isDirectory()) {
             p += getFileNameFromLink(reference);
