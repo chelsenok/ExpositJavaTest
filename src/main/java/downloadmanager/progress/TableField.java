@@ -19,6 +19,12 @@ enum TableField {
             return "downloaded";
         }
     },
+    SPEED {
+        @Override
+        String getName() {
+            return "speed";
+        }
+    },
     CORRUPTED {
         @Override
         String getName() {

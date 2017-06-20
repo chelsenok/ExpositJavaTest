@@ -24,22 +24,30 @@ public final class Main {
     private static final ProgressWriter sProgressWriter = new ProgressWriter();
     private static Downloader sDownloader;
     private static final Observer sObserver = (o, arg) -> {
-        switch ((ChangeType) arg) {
-            case CORRUPTED_FILES:
-                sProgressWriter.setCorruptedFiles(sDownloader.getCorruptedFiles());
-                break;
-            case DOWNLOAD_FILES:
-                sProgressWriter.setDownloadedFiles(sDownloader.getDownloadFiles());
-                break;
-            case IN_PROCESS_FILES:
-                sProgressWriter.setInProcessFiles(sDownloader.getInProcessFiles());
-                break;
-            case TOTAL_FILES:
-                sProgressWriter.setTotalFiles(sDownloader.getTotalFiles());
-                break;
-            case DOWNLOADED_SIZE:
-                sProgressWriter.setProgress(sDownloader.getDownloadSize() / (double) sDownloader.getTotalSize());
-                break;
+        if (arg != null) {
+            switch ((ChangeType) arg) {
+                case CORRUPTED_FILES:
+                    sProgressWriter.setCorruptedFiles(sDownloader.getCorruptedFiles());
+                    break;
+                case DOWNLOAD_FILES:
+                    sProgressWriter.setDownloadedFiles(sDownloader.getDownloadFiles());
+                    break;
+                case IN_PROCESS_FILES:
+                    sProgressWriter.setInProcessFiles(sDownloader.getInProcessFiles());
+                    break;
+                case TOTAL_FILES:
+                    sProgressWriter.setTotalFiles(sDownloader.getTotalFiles());
+                    break;
+                case DOWNLOADED_SIZE:
+                    sProgressWriter.setProgress(sDownloader.getDownloadSize() / (double) sDownloader.getTotalSize());
+                    break;
+                case NOTHING_TO_DOWNLOAD:
+                    sProgressWriter.stopUpdating();
+                    break;
+                case DOWNLOAD_SPEED:
+                    sProgressWriter.setSpeed(sDownloader.getSpeed());
+                    break;
+            }
         }
     };
 
@@ -47,9 +55,7 @@ public final class Main {
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         args = new String[]{
                 "-f",
-                "file.csv",
-                "-t",
-                "2"
+                "file.csv"
         };
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         final ArgumentManager argumentManager = new ArgumentManager(args);
@@ -135,11 +141,11 @@ public final class Main {
     }
 
     private static ArgumentsStatusMessage getArgumentsStatusMessage(final ArgumentManager manager) {
+        if (manager.isValid && manager.needHelp) {
+            return ArgumentsStatusMessage.HELP;
+        }
         if (!manager.isValid || (manager.reference == null && manager.filePath == null)) {
             return ArgumentsStatusMessage.SYNTAX_ERROR;
-        }
-        if (manager.needHelp) {
-            return ArgumentsStatusMessage.HELP;
         }
         if (manager.reference != null && manager.filePath != null) {
             return ArgumentsStatusMessage.LACK_OF_DATA;

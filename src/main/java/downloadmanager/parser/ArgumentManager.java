@@ -67,11 +67,10 @@ public class ArgumentManager {
     }
 
     private int getThreads(final Map<String, String[]> map, final String type) {
-        final Integer integer = Integer.valueOf(get(map, THREADS.getType()));
-        if (integer == null) {
-            return  1;
-        } else {
-            return integer;
+        try {
+            return Integer.valueOf(get(map, THREADS.getType()));
+        } catch (NumberFormatException ignored) {
+            return 1;
         }
     }
 }
