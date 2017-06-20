@@ -7,6 +7,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Observer;
 
+import downloadmanager.downloader.AccessRight;
 import downloadmanager.downloader.ChangeType;
 import downloadmanager.downloader.Downloader;
 import downloadmanager.downloader.File;
@@ -131,7 +132,7 @@ public final class Main {
         if (manager.threads < 1) {
             return ArgumentsStatusMessage.WRONG_THREAD_NUMBER;
         }
-        if (manager.downloadPath != null && !FileAccessor.isWritable(manager.downloadPath)) {
+        if (manager.downloadPath != null && FileAccessor.getAccessRight(manager.downloadPath) == AccessRight.DENIED) {
             return ArgumentsStatusMessage.ACCESS_DENIED;
         }
         return ArgumentsStatusMessage.SUCCESS;

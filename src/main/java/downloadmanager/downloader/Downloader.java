@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Observable;
 
+import static downloadmanager.downloader.AccessRight.FILE_EXIST;
 import static downloadmanager.downloader.ChangeType.CORRUPTED_FILES;
 import static downloadmanager.downloader.ChangeType.DOWNLOADED_SIZE;
 import static downloadmanager.downloader.ChangeType.DOWNLOAD_FILES;
@@ -105,21 +106,29 @@ public class Downloader extends Observable {
             return;
         }
         File file = mProperFiles[mFilePointer];
-        createFile(file.path);
+        final String realPath = createFile(file.path);
         try {
             mDirectDownloader.download(new DownloadTask(
                     new URL(file.link),
-                    new FileOutputStream(file.path),
+                    new FileOutputStream(realPath),
                     getDownloadListener()
             ));
         } catch (FileNotFoundException | MalformedURLException ignored) {
         }
     }
 
-    private void createFile(String path) {
+    private String createFile(final String path) {
         try {
+            int index = 1;
+            String realPath = path;
+            while (FileAccessor.getAccessRight(realPath) == FILE_EXIST) {
+                realPath = FileAccessor.addFileIndex(path, index);
+                index++;
+            }
             new java.io.File(path).createNewFile();
+            return realPath;
         } catch (IOException ignored) {
+            return "";
         }
     }
 

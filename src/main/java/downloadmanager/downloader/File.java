@@ -15,7 +15,7 @@ public class File {
             isWritable = false;
         } else {
             this.path = getFullPath(path, link);
-            isWritable = FileAccessor.isWritable(this.path);
+            isWritable = FileAccessor.getAccessRight(this.path) != AccessRight.DENIED;
         }
     }
 
