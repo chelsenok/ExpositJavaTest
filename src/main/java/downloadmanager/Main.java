@@ -5,7 +5,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.Observable;
 import java.util.Observer;
 
 import downloadmanager.downloader.ChangeType;
@@ -23,27 +22,23 @@ public final class Main {
     private static final String APP_NAME = "downloadmanager";
     private static final ProgressWriter sProgressWriter = new ProgressWriter();
     private static Downloader sDownloader;
-    private static final Observer sObserver = new Observer() {
-
-        @Override
-        public synchronized void update(Observable o, Object arg) {
-            switch ((ChangeType) arg) {
-                case CORRUPTED_FILES:
-                    sProgressWriter.setCorruptedFiles(sDownloader.getCorruptedFiles());
-                    break;
-                case DOWNLOAD_FILES:
-                    sProgressWriter.setDownloadedFiles(sDownloader.getDownloadFiles());
-                    break;
-                case IN_PROCESS_FILES:
-                    sProgressWriter.setInProcessFiles(sDownloader.getInProcessFiles());
-                    break;
-                case TOTAL_FILES:
-                    sProgressWriter.setTotalFiles(sDownloader.getTotalFiles());
-                    break;
-                case DOWNLOADED_SIZE:
-                    sProgressWriter.setProgress(sDownloader.getDownloadSize() / sDownloader.getTotalSize());
-                    break;
-            }
+    private static final Observer sObserver = (o, arg) -> {
+        switch ((ChangeType) arg) {
+            case CORRUPTED_FILES:
+                sProgressWriter.setCorruptedFiles(sDownloader.getCorruptedFiles());
+                break;
+            case DOWNLOAD_FILES:
+                sProgressWriter.setDownloadedFiles(sDownloader.getDownloadFiles());
+                break;
+            case IN_PROCESS_FILES:
+                sProgressWriter.setInProcessFiles(sDownloader.getInProcessFiles());
+                break;
+            case TOTAL_FILES:
+                sProgressWriter.setTotalFiles(sDownloader.getTotalFiles());
+                break;
+            case DOWNLOADED_SIZE:
+                sProgressWriter.setProgress(sDownloader.getDownloadSize() / (double) sDownloader.getTotalSize());
+                break;
         }
     };
 

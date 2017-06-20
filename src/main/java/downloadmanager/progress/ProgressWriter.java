@@ -2,6 +2,10 @@ package downloadmanager.progress;
 
 public class ProgressWriter {
 
+    private final String ANSI_RESET = "\u001B[0m";
+    private final String ANSI_BLACK = "\u001B[30m";
+    private final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
+
     private final String SEPARATOR = "|";
     private final char FILL = ' ';
     private final String PROGRESS = "progress";
@@ -17,6 +21,7 @@ public class ProgressWriter {
     private int mInProcessFiles;
     private int mDownloadedFiles;
     private int mCorruptedFiles;
+    private int mCurrentFilledWidth;
 
     public void printDefaultFields() {
         System.out.println(SEPARATOR
@@ -29,14 +34,38 @@ public class ProgressWriter {
         updateConsole();
     }
 
-    private void updateConsole() {
+    private synchronized void updateConsole() {
         System.out.print('\r' + SEPARATOR);
+        if (mCurrentFilledWidth != 0) {
+            System.out.print(ANSI_WHITE_BACKGROUND + String.format("%" + mCurrentFilledWidth + "s", FILL));
+        }
+        if (mCurrentFilledWidth != PROGRESS_WIDTH) {
+            System.out.print(ANSI_RESET + String.format("%" + (PROGRESS_WIDTH - mCurrentFilledWidth) + "s", FILL));
+        }
+        System.out.print(ANSI_RESET + SEPARATOR
+                + getFilledValue(mInProcessFiles)
+                + getFilledValue(mDownloadedFiles)
+                + getFilledValue(mCorruptedFiles)
+                + getFilledValue(mTotalFiles)
+        );
+    }
 
+    private String getFilledValue(int value) {
+        return String.format("%" + (DEFAULT_WIDTH - String.valueOf(value).length()) + "s", FILL)
+                + value + SEPARATOR;
     }
 
     public void setProgress(double progress) {
         mProgress = progress;
-        updateConsole();
+        final int newValue = (int) (PROGRESS_WIDTH * mProgress);
+        if (mCurrentFilledWidth != PROGRESS_WIDTH) {
+            if (mCurrentFilledWidth != newValue) {
+                mCurrentFilledWidth = newValue;
+                updateConsole();
+            }
+        } else {
+            System.out.print('\n');
+        }
     }
 
     public void setTotalFiles(int totalFiles) {

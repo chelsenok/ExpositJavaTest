@@ -8,7 +8,7 @@ import java.util.List;
 
 public class CsvReader implements Reader {
 
-    private final String SEPARATOR = ",";
+    private final String SEPARATOR = ";";
 
     public String[][] readContent(final String path) {
         BufferedReader br = null;

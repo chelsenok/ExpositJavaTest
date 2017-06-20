@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Observable;
 
@@ -33,6 +34,21 @@ public class Downloader extends Observable {
     public Downloader(final File[] files, int threads) {
         final List<File> properList = new ArrayList<>();
         final List<File> corruptedList = new ArrayList<>();
+        distributeFiles(files, properList, corruptedList);
+        mThreads = getThreads(threads, properList.size());
+        if (mThreads != threads) {
+            notifyObservers(THREADS_COUNT);
+        }
+        mCorruptedFiles = corruptedList.toArray(new File[corruptedList.size()]);
+        notifyObservers(CORRUPTED_FILES);
+        mProperFiles = properList.toArray(new File[properList.size()]);
+        notifyObservers(TOTAL_FILES);
+        mTotalSize = calculateTotalSize(mProperFiles);
+        notifyObservers(TOTAL_SIZE);
+        mDirectDownloader = new DirectDownloader();
+    }
+
+    private void distributeFiles(File[] files, Collection<File> properList, Collection<File> corruptedList) {
         for (final File file :
                 files) {
             if (file.isWritable) {
@@ -41,17 +57,6 @@ public class Downloader extends Observable {
                 corruptedList.add(file);
             }
         }
-        mThreads = getThreads(threads, properList.size());
-        if (mThreads != threads) {
-            notifyObservers(THREADS_COUNT);
-        }
-        mProperFiles = properList.toArray(new File[properList.size()]);
-        mCorruptedFiles = corruptedList.toArray(new File[corruptedList.size()]);
-        notifyObservers(CORRUPTED_FILES);
-        notifyObservers(TOTAL_FILES);
-        mTotalSize = calculateTotalSize(mProperFiles);
-        notifyObservers(TOTAL_SIZE);
-        mDirectDownloader = new DirectDownloader();
     }
 
     public void download() {

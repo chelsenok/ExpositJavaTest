@@ -14,6 +14,9 @@ public final class FileAccessor {
         try {
             File file = new File(path);
             boolean response = file.createNewFile();
+            if (!response) {
+                return response;
+            }
             file.delete();
             return response;
         } catch (IOException e) {

@@ -34,10 +34,6 @@ public class File {
     }
 
     private boolean isLinkValid(final String reference) {
-        return new UrlValidator().isValid(reference) && isLinkDownloadFile(reference);
-    }
-
-    private boolean isLinkDownloadFile(final String reference) {
-        return reference.substring(reference.lastIndexOf('/')).contains(".");
+        return new UrlValidator().isValid(reference);
     }
 }

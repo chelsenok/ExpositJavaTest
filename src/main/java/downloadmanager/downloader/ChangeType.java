@@ -7,5 +7,5 @@ public enum ChangeType {
     IN_PROCESS_FILES,
     TOTAL_SIZE,
     DOWNLOADED_SIZE,
-    TOTAL_FILES,
+    TOTAL_FILES
 }
