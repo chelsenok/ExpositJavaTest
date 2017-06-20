@@ -37,15 +37,9 @@ public class Downloader extends Observable {
         final List<File> corruptedList = new ArrayList<>();
         distributeFiles(files, properList, corruptedList);
         mThreads = getThreads(threads, properList.size());
-        if (mThreads != threads) {
-            notifyObservers(THREADS_COUNT);
-        }
         mCorruptedFiles = corruptedList.toArray(new File[corruptedList.size()]);
-        notifyObservers(CORRUPTED_FILES);
         mProperFiles = properList.toArray(new File[properList.size()]);
-        notifyObservers(TOTAL_FILES);
         mTotalSize = calculateTotalSize(mProperFiles);
-        notifyObservers(TOTAL_SIZE);
         mDirectDownloader = new DirectDownloader();
     }
 
@@ -61,6 +55,10 @@ public class Downloader extends Observable {
     }
 
     public void download() {
+        notifyObservers(THREADS_COUNT);
+        notifyObservers(CORRUPTED_FILES);
+        notifyObservers(TOTAL_FILES);
+        notifyObservers(TOTAL_SIZE);
         for (mFilePointer = 0; mFilePointer < mThreads; mFilePointer++) {
             download(mFilePointer);
         }
@@ -89,6 +87,7 @@ public class Downloader extends Observable {
                 notifyObservers(IN_PROCESS_FILES);
                 download(mFilePointer);
                 ++mFilePointer;
+                checkFinish();
             }
 
             @Override
@@ -97,8 +96,16 @@ public class Downloader extends Observable {
                 notifyObservers(IN_PROCESS_FILES);
                 download(mFilePointer);
                 ++mFilePointer;
+                checkFinish();
             }
         };
+    }
+
+    private void checkFinish() {
+        if (getDownloadFiles() + getCorruptedFiles() == getTotalFiles()) {
+            mDownloadedSize = mTotalSize;
+            notifyObservers(DOWNLOADED_SIZE);
+        }
     }
 
     private void download(int index) {
@@ -140,7 +147,7 @@ public class Downloader extends Observable {
         }
     }
 
-    private int getFileSize(URL url) {
+    static int getFileSize(URL url) {
         HttpURLConnection conn = null;
         try {
             conn = (HttpURLConnection) url.openConnection();
@@ -167,7 +174,7 @@ public class Downloader extends Observable {
     }
 
     @Override
-    public void notifyObservers(Object arg) {
+    public synchronized void notifyObservers(Object arg) {
         setChanged();
         super.notifyObservers(arg);
     }
@@ -193,7 +200,7 @@ public class Downloader extends Observable {
     }
 
     public int getTotalFiles() {
-        return getCorruptedFiles() + getDownloadFiles() + getInProcessFiles();
+        return mProperFiles.length + mCorruptedFiles.length;
     }
 
     public int getTotalSize() {

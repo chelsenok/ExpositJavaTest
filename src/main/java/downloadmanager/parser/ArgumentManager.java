@@ -19,15 +19,15 @@ public class ArgumentManager {
 
     public ArgumentManager(final String[] args) {
         final Map<String, String[]> map = new ArgumentParser(args).getArgumentedMap();
-        downloadPath = (String) get(map, DOWNLOAD_PATH.getType());
-        filePath = (String) get(map, FILE_PATH.getType());
-        reference = (String) get(map, REFERENCE.getType());
+        downloadPath = get(map, DOWNLOAD_PATH.getType());
+        filePath = get(map, FILE_PATH.getType());
+        reference = get(map, REFERENCE.getType());
         threads = getThreads(map, THREADS.getType());
         needHelp = needHelp(map, HELP.getType());
         isValid = isValid(map, needHelp);
     }
 
-    private Object get(final Map<String, String[]> map, final String type) {
+    private String get(final Map<String, String[]> map, final String type) {
         if (map.containsKey(type) && map.get(type).length == 1) {
             return map.get(type)[0];
         } else {
@@ -67,7 +67,7 @@ public class ArgumentManager {
     }
 
     private int getThreads(final Map<String, String[]> map, final String type) {
-        final Integer integer = (Integer) get(map, THREADS.getType());
+        final Integer integer = Integer.valueOf(get(map, THREADS.getType()));
         if (integer == null) {
             return  1;
         } else {

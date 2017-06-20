@@ -2,6 +2,9 @@ package downloadmanager.downloader;
 
 import org.apache.commons.validator.routines.UrlValidator;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 public class File {
 
     final String link;
@@ -34,6 +37,10 @@ public class File {
     }
 
     private boolean isLinkValid(final String reference) {
-        return new UrlValidator().isValid(reference);
+        try {
+            return new UrlValidator().isValid(reference) && Downloader.getFileSize(new URL(reference)) != -1;
+        } catch (MalformedURLException e) {
+            return false;
+        }
     }
 }

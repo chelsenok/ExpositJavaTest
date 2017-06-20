@@ -1,89 +1,100 @@
 package downloadmanager.progress;
 
+import java.text.DecimalFormat;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import static downloadmanager.progress.TableField.CORRUPTED;
+import static downloadmanager.progress.TableField.DOWNLOADED;
+import static downloadmanager.progress.TableField.IN_PROCESS;
+import static downloadmanager.progress.TableField.PROGRESS;
+import static downloadmanager.progress.TableField.TOTAL;
+
 public class ProgressWriter {
 
-    private final String ANSI_RESET = "\u001B[0m";
-    private final String ANSI_BLACK = "\u001B[30m";
-    private final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
-
+    private final int PERIOD = 1000;
+    private final int MAX_PROGRESS_VALUE = 100;
     private final String SEPARATOR = "|";
     private final char FILL = ' ';
-    private final String PROGRESS = "progress";
-    private final int PROGRESS_WIDTH = 25;
-    private final int DEFAULT_WIDTH = 11;
-    private final String IN_PROCESS = "in process";
-    private final String DOWNLOADED = "downloaded";
-    private final String CORRUPTED = "corrupted";
-    private final String TOTAL = "total";
+    private final int DEFAULT_WIDTH;
+    private TimerTask mTimerTask;
 
     private double mProgress;
     private int mTotalFiles;
     private int mInProcessFiles;
     private int mDownloadedFiles;
     private int mCorruptedFiles;
-    private int mCurrentFilledWidth;
+
+    private final Timer mOutputThread;
+
+    public ProgressWriter() {
+        int maxLength = 0;
+        for (TableField field :
+                TableField.values()) {
+            if (field.getName().length() > maxLength) {
+                maxLength = field.getName().length();
+            }
+        }
+        DEFAULT_WIDTH = maxLength + 1;
+        mOutputThread = new Timer();
+    }
 
     public void printDefaultFields() {
         System.out.println(SEPARATOR
-                + PROGRESS + String.format("%" + (PROGRESS_WIDTH - PROGRESS.length()) + "s", FILL) + SEPARATOR
-                + IN_PROCESS + String.format("%" + (DEFAULT_WIDTH - IN_PROCESS.length()) + "s", FILL) + SEPARATOR
-                + DOWNLOADED + String.format("%" + (DEFAULT_WIDTH - DOWNLOADED.length()) + "s", FILL) + SEPARATOR
-                + CORRUPTED + String.format("%" + (DEFAULT_WIDTH - CORRUPTED.length()) + "s", FILL) + SEPARATOR
-                + TOTAL + String.format("%" + (DEFAULT_WIDTH - TOTAL.length()) + "s", FILL) + SEPARATOR
+                + PROGRESS.getName() + String.format("%" + (DEFAULT_WIDTH - PROGRESS.getName().length()) + "s", FILL) + SEPARATOR
+                + IN_PROCESS.getName() + String.format("%" + (DEFAULT_WIDTH - IN_PROCESS.getName().length()) + "s", FILL) + SEPARATOR
+                + DOWNLOADED.getName() + String.format("%" + (DEFAULT_WIDTH - DOWNLOADED.getName().length()) + "s", FILL) + SEPARATOR
+                + CORRUPTED.getName() + String.format("%" + (DEFAULT_WIDTH - CORRUPTED.getName().length()) + "s", FILL) + SEPARATOR
+                + TOTAL.getName() + String.format("%" + (DEFAULT_WIDTH - TOTAL.getName().length()) + "s", FILL) + SEPARATOR
         );
+        mTimerTask = new TimerTask() {
+
+            @Override
+            public void run() {
+                updateConsole();
+            }
+        };
+        mOutputThread.schedule(mTimerTask, 0, PERIOD);
     }
 
     private synchronized void updateConsole() {
-        System.out.print('\r' + SEPARATOR);
-        if (mCurrentFilledWidth != 0) {
-            System.out.print(ANSI_WHITE_BACKGROUND + String.format("%" + mCurrentFilledWidth + "s", FILL));
-        }
-        if (mCurrentFilledWidth != PROGRESS_WIDTH) {
-            System.out.print(ANSI_RESET + String.format("%" + (PROGRESS_WIDTH - mCurrentFilledWidth) + "s", FILL));
-        }
-        System.out.print(ANSI_RESET + SEPARATOR
-                + getFilledValue(mInProcessFiles)
-                + getFilledValue(mDownloadedFiles)
-                + getFilledValue(mCorruptedFiles)
-                + getFilledValue(mTotalFiles)
+        System.out.print('\r' + SEPARATOR
+                + getFilledValue(new DecimalFormat("0.00").format(mProgress) + '%')
+                + getFilledValue(String.valueOf(mInProcessFiles))
+                + getFilledValue(String.valueOf(mDownloadedFiles))
+                + getFilledValue(String.valueOf(mCorruptedFiles))
+                + getFilledValue(String.valueOf(mTotalFiles))
         );
     }
 
-    private String getFilledValue(int value) {
-        return String.format("%" + (DEFAULT_WIDTH - String.valueOf(value).length()) + "s", FILL)
+    private String getFilledValue(CharSequence value) {
+        return String.format("%" + (DEFAULT_WIDTH - value.length()) + "s", FILL)
                 + value + SEPARATOR;
     }
 
     public void setProgress(double progress) {
-        mProgress = progress;
-        final int newValue = (int) (PROGRESS_WIDTH * mProgress);
-        if (mCurrentFilledWidth != PROGRESS_WIDTH) {
-            if (mCurrentFilledWidth != newValue) {
-                mCurrentFilledWidth = newValue;
-                updateConsole();
-            }
-        } else {
+        mProgress = progress * MAX_PROGRESS_VALUE;
+        if (mProgress == MAX_PROGRESS_VALUE) {
+            mOutputThread.cancel();
+            mOutputThread.purge();
+            mTimerTask.run();
             System.out.print('\n');
         }
     }
 
     public void setTotalFiles(int totalFiles) {
         mTotalFiles = totalFiles;
-        updateConsole();
     }
 
     public void setInProcessFiles(int inProcessFiles) {
         mInProcessFiles = inProcessFiles;
-        updateConsole();
     }
 
     public void setDownloadedFiles(int downloadedFiles) {
         mDownloadedFiles = downloadedFiles;
-        updateConsole();
     }
 
     public void setCorruptedFiles(int corruptedFiles) {
         mCorruptedFiles = corruptedFiles;
-        updateConsole();
     }
 }

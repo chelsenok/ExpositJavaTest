@@ -47,7 +47,9 @@ public final class Main {
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         args = new String[]{
                 "-f",
-                "file.csv"
+                "file.csv",
+                "-t",
+                "2"
         };
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         final ArgumentManager argumentManager = new ArgumentManager(args);
@@ -62,8 +64,8 @@ public final class Main {
         final File[] files = getFiles(argumentManager, downloadType);
         sDownloader = new Downloader(files, argumentManager.threads);
         sDownloader.addObserver(sObserver);
-        sDownloader.download();
         sProgressWriter.printDefaultFields();
+        sDownloader.download();
     }
 
     private static @Nullable File[] getFiles(final ArgumentManager manager, final DownloadDataType downloadType) {
