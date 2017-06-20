@@ -8,7 +8,7 @@ import java.io.IOException;
 public final class FileAccessor {
 
     public static AccessRight getAccessRight(@NotNull String path) {
-        if (path.lastIndexOf('/') > path.lastIndexOf('.')) {
+        if (new File(path).isDirectory()) {
             path += "/gkjhreughuierhgkjdfngkjhreguhergiuh.zxc";
         }
         try {

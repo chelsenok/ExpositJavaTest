@@ -45,7 +45,10 @@ public final class Main {
 
     public static void main(String... args) {
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-        args = new String[]{"-f", "file.csv"};
+        args = new String[]{
+                "-f",
+                "file.csv"
+        };
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         final ArgumentManager argumentManager = new ArgumentManager(args);
         final ArgumentsStatusMessage message = getArgumentsStatusMessage(argumentManager);
@@ -64,10 +67,16 @@ public final class Main {
     }
 
     private static @Nullable File[] getFiles(final ArgumentManager manager, final DownloadDataType downloadType) {
+        @Nullable String clearPath;
+        try {
+            clearPath = manager.downloadPath.replace("\\", "/");
+        } catch (NullPointerException ignored) {
+            clearPath = null;
+        }
         if (downloadType == DownloadDataType.SINGLE_REFERENCE) {
             return new File[]{new File(
                     manager.reference,
-                    manager.downloadPath
+                    clearPath
             )};
         }
         if (downloadType == DownloadDataType.FILE) {
@@ -83,10 +92,14 @@ public final class Main {
             final File[] files = new File[content.length];
             for (int i = 0; i < content.length; i++) {
                 final String p;
-                if (manager.downloadPath == null) {
+                if (clearPath == null) {
                     p = "";
                 } else {
-                    p = manager.downloadPath + "/";
+                    if (clearPath.charAt(clearPath.length() - 1) != '/') {
+                        p = clearPath + '/';
+                    } else {
+                        p = clearPath;
+                    }
                 }
                 files[i] = new File(content[i][0], p + content[i][1]);
             }

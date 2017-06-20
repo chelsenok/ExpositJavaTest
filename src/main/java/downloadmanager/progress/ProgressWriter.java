@@ -31,7 +31,6 @@ public class ProgressWriter {
                 + CORRUPTED + String.format("%" + (DEFAULT_WIDTH - CORRUPTED.length()) + "s", FILL) + SEPARATOR
                 + TOTAL + String.format("%" + (DEFAULT_WIDTH - TOTAL.length()) + "s", FILL) + SEPARATOR
         );
-        updateConsole();
     }
 
     private synchronized void updateConsole() {
