@@ -5,12 +5,6 @@ enum ArgumentsStatusMessage {
             return "Unknown file format.\n" + TRY_HELP.getMessage(appName);
         }
     },
-    LACK_OF_DATA {
-        @Override
-        public String getMessage(final String appName) {
-            return "Lack of data for downloading.\n" + TRY_HELP.getMessage(appName);
-        }
-    },
     SYNTAX_ERROR {
         @Override
         public String getMessage(final String appName) {
@@ -39,12 +33,6 @@ enum ArgumentsStatusMessage {
         @Override
         public String getMessage(final String appName) {
             return "File does not exist.\n" + TRY_HELP.getMessage(appName);
-        }
-    },
-    WRONG_THREAD_NUMBER {
-        @Override
-        public String getMessage(final String appName) {
-            return "Thread number is wrong.\n" + TRY_HELP.getMessage(appName);
         }
     },
     ACCESS_DENIED {

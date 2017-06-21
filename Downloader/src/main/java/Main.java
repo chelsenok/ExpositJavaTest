@@ -5,11 +5,11 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Observer;
 
-import downloader.AccessRight;
 import downloader.ChangeType;
 import downloader.Downloader;
 import downloader.File;
-import downloader.FileAccessor;
+import downloader.filemanager.AccessRight;
+import downloader.filemanager.FileAccessor;
 import parser.ArgumentManager;
 import progress.ProgressWriter;
 import reader.Reader;
@@ -90,10 +90,10 @@ public final class Main {
         }
         if (downloadType == DownloadDataType.FILE) {
             final String path = manager.filePath;
-            if (!fileExist(path)) {
+            if (!FileAccessor.fileExist(path)) {
                 exit(ArgumentsStatusMessage.NON_EXISTENT_FILE.getMessage(APP_NAME));
             }
-            final Reader reader = getReader(path);
+            final Reader reader = ReaderFactory.getStrategy(FileAccessor.getFileExtension(path));
             if (reader == null) {
                 exit(ArgumentsStatusMessage.UNKNOWN_FILE_FORMAT.getMessage(APP_NAME));
             }
@@ -115,20 +115,6 @@ public final class Main {
             return files;
         }
         return null;
-    }
-
-    private static boolean fileExist(final String path) {
-        final java.io.File f = new java.io.File(path);
-        return f.exists() && !f.isDirectory() && f.canRead();
-    }
-
-    private static Reader getReader(final String path) {
-        String extension = "";
-        final int i = path.lastIndexOf('.');
-        if (i > 0) {
-            extension = path.substring(i + 1);
-        }
-        return ReaderFactory.getStrategy(extension);
     }
 
     private static DownloadDataType getDownloadType(final ArgumentManager manager) {

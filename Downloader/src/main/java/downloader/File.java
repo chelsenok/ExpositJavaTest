@@ -1,5 +1,8 @@
 package downloader;
 
+import downloader.filemanager.AccessRight;
+import downloader.filemanager.FileAccessor;
+
 public class File {
 
     final String link;
