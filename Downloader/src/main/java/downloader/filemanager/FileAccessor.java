@@ -1,4 +1,4 @@
-package downloader;
+package downloader.filemanager;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -42,5 +42,19 @@ public final class FileAccessor {
                 file.substring(0, file.indexOf('.')) +
                 " (" + index + ")" +
                 file.substring(file.indexOf('.'));
+    }
+
+    public static boolean fileExist(final String path) {
+        final java.io.File f = new java.io.File(path);
+        return f.exists() && !f.isDirectory() && f.canRead();
+    }
+
+    public static String getFileExtension(final String path) {
+        String extension = "";
+        final int i = path.lastIndexOf('.');
+        if (i > 0) {
+            extension = path.substring(i + 1);
+        }
+        return extension;
     }
 }

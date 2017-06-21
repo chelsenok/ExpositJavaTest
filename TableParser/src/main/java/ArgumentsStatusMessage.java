@@ -1,0 +1,52 @@
+enum ArgumentsStatusMessage {
+    UNKNOWN_FILE_FORMAT {
+        @Override
+        public String getMessage(final String appName) {
+            return "Unknown file format.\n" + TRY_HELP.getMessage(appName);
+        }
+    },
+    SAME_INPUT_OUTPUT {
+        @Override
+        public String getMessage(final String appName) {
+            return "Input and output files are the same.";
+        }
+    },
+    SYNTAX_ERROR {
+        @Override
+        public String getMessage(final String appName) {
+            return appName + ": missing operand\n" + TRY_HELP.getMessage(appName);
+        }
+    },
+    TRY_HELP {
+        @Override
+        public String getMessage(final String appName) {
+            return "Try '" + appName + " --help' for more information.";
+        }
+    },
+    HELP {
+        @Override
+        public String getMessage(final String appName) {
+            return "Help information HERE!";
+        }
+    },
+    SUCCESS {
+        @Override
+        public String getMessage(final String appName) {
+            return "Success.";
+        }
+    },
+    NON_EXISTENT_FILE {
+        @Override
+        public String getMessage(final String appName) {
+            return "File does not exist.\n" + TRY_HELP.getMessage(appName);
+        }
+    },
+    ACCESS_DENIED {
+        @Override
+        public String getMessage(final String appName) {
+            return "Access to this path for '" + appName + "' is denied";
+        }
+    };
+
+    public abstract String getMessage(final String appName);
+}

@@ -1,4 +1,4 @@
-package downloader;
+package filemanager;
 
 public enum AccessRight {
     DENIED,

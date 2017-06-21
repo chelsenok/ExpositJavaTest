@@ -13,7 +13,9 @@ import java.util.Observable;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static downloader.AccessRight.FILE_EXIST;
+import downloader.filemanager.FileAccessor;
+
+import static downloader.filemanager.AccessRight.FILE_EXIST;
 import static downloader.ChangeType.CORRUPTED_FILES;
 import static downloader.ChangeType.DOWNLOADED_SIZE;
 import static downloader.ChangeType.DOWNLOAD_FILES;
