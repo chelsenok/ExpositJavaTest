@@ -1,0 +1,14 @@
+package downloader;
+
+public enum ChangeType {
+    THREADS_COUNT,
+    DOWNLOAD_FILES,
+    CORRUPTED_FILES,
+    IN_PROCESS_FILES,
+    TOTAL_SIZE,
+    DOWNLOADED_SIZE,
+    TOTAL_FILES,
+    NOTHING_TO_DOWNLOAD,
+    DOWNLOAD_SPEED,
+    TIME_LEFT
+}
