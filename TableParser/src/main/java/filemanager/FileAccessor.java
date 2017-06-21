@@ -1,13 +1,11 @@
 package filemanager;
 
-import com.sun.istack.internal.NotNull;
-
 import java.io.File;
 import java.io.IOException;
 
 public final class FileAccessor {
 
-    public static AccessRight getAccessRight(@NotNull String path) {
+    public static AccessRight getAccessRight(String path) {
         if (new File(path).isDirectory()) {
             path += "/gkjhreughuierhgkjdfngkjhreguhergiuh.zxc";
         }

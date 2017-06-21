@@ -52,13 +52,7 @@ public final class Main {
         }
     };
 
-    public static void main(String... args) {
-        /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-        args = new String[]{
-                "-f",
-                "file.csv"
-        };
-        /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+    public static void main(final String... args) {
         final ArgumentManager argumentManager = new ArgumentManager(args);
         final ArgumentsStatusMessage message = getArgumentsStatusMessage(argumentManager);
         if (message != (ArgumentsStatusMessage.SUCCESS)) {

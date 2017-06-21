@@ -5,6 +5,12 @@ enum ArgumentsStatusMessage {
             return "Unknown file format.\n" + TRY_HELP.getMessage(appName);
         }
     },
+    SAME_INPUT_OUTPUT {
+        @Override
+        public String getMessage(final String appName) {
+            return "Input and output files are the same.";
+        }
+    },
     SYNTAX_ERROR {
         @Override
         public String getMessage(final String appName) {

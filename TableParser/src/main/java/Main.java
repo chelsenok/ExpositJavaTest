@@ -8,24 +8,17 @@ import filemanager.AccessRight;
 import filemanager.FileAccessor;
 import io.reader.Reader;
 import io.reader.ReaderFactory;
+import io.writer.Writer;
+import io.writer.WriterFactory;
 import parser.ArgumentManager;
 
 public final class Main {
 
     private static final String APP_NAME = "tableparser";
+    private static final String DONE = "Done.";
     private static final String INPUT_FILE_CORRUPTED = "Input file corrupted.";
 
-    public static void main(String... args) {
-        /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-        args = new String[]{
-                "-i",
-                "file.csv",
-                "-o",
-                "response.csv",
-                "-q",
-                "one"
-        };
-        /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+    public static void main(final String... args) {
         final ArgumentManager argumentManager = new ArgumentManager(args);
         final ArgumentsStatusMessage message = getArgumentsStatusMessage(argumentManager);
         if (message != (ArgumentsStatusMessage.SUCCESS)) {
@@ -35,7 +28,8 @@ public final class Main {
                 argumentManager.sourceFile,
                 FileAccessor.getFileExtension(argumentManager.sourceFile)
         );
-        if (reader == null) {
+        final Writer writer = WriterFactory.getStrategy(FileAccessor.getFileExtension(argumentManager.writeFile));
+        if (reader == null || writer == null) {
             exit(ArgumentsStatusMessage.UNKNOWN_FILE_FORMAT.getMessage(APP_NAME));
         }
         final List<String[]> list = new ArrayList<>();
@@ -47,6 +41,8 @@ public final class Main {
         if (response == null) {
             exit(INPUT_FILE_CORRUPTED);
         }
+        writer.write(argumentManager.writeFile, response);
+        System.out.println(DONE);
     }
 
     private static String[][] getIndexedColumns(final String[][] table, final int[] indexes) {
@@ -91,6 +87,9 @@ public final class Main {
         }
         if (!FileAccessor.fileExist(manager.sourceFile)) {
             return ArgumentsStatusMessage.NON_EXISTENT_FILE;
+        }
+        if (manager.sourceFile.equals(manager.writeFile)) {
+            return ArgumentsStatusMessage.SAME_INPUT_OUTPUT;
         }
         return ArgumentsStatusMessage.SUCCESS;
     }
